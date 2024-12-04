@@ -170,10 +170,10 @@ export default defineComponent({
         rowsPerPage: 10,
       }),
      rows :ref([
-  { name:'Ayushi',farmer_id:123,problem:'log in'},
-  { name:'Ayushi',farmer_id:123,problem:'log in'},
-  { name:'Ayushi',farmer_id:123,problem:'log in'},
-  { name:'Ayushi',farmer_id:123,problem:'log in'},
+  { name:'Ayushi',farmer_id:123,problem:'log in',date:'04-12-2024',time:'16:20'},
+  { name:'Ayushi',farmer_id:123,problem:'log in',date:'04-12-2024',time:'16:20'},
+  { name:'Ayushi',farmer_id:123,problem:'log in',date:'04-12-2024',time:'16:20'},
+  { name:'Ayushi',farmer_id:123,problem:'log in',date:'04-12-2024',time:'16:20'},
 ]),
       columns: ref([
         {
@@ -198,6 +198,22 @@ export default defineComponent({
           label: "Problem",
           align: "left",
           field: (row) => row.problem,
+          format: (val) => `${val}`,
+          sortable: true,
+        },
+        {
+          name: "date",
+          label: "Date",
+          align: "left",
+          field: (row) => row.date,
+          format: (val) => `${val}`,
+          sortable: true,
+        },
+        {
+          name: "time",
+          label: "Time",
+          align: "left",
+          field: (row) => row.time,
           format: (val) => `${val}`,
           sortable: true,
         },

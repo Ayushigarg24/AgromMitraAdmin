@@ -53,6 +53,7 @@ background: linear-gradient(90deg, rgba(11,9,47,1) 0%, rgba(14,14,25,1) 35%, rgb
 
 <script>
 import { defineComponent, onMounted, ref, onBeforeUnmount } from 'vue';
+import axios from 'axios';
 import * as echarts from 'echarts/core';
 import { GridComponent, TooltipComponent, LegendComponent } from 'echarts/components';
 import { LineChart, PieChart } from 'echarts/charts';
@@ -70,28 +71,43 @@ export default defineComponent({
     let myLineChart = null;
     let myPieChart = null;
 
-    const initLineChart = () => {
+    const initLineChart = async () => {
       if (!lineChart.value) return;
       myLineChart = echarts.init(lineChart.value);
 
-      const option = {
-        xAxis: {
-          type: 'category',
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-        },
-        yAxis: {
-          type: 'value',
-        },
-        series: [
-          {
-            data: [820, 932, 901, 934, 1290, 1330, 1320],
-            type: 'line',
-            smooth: true,
-          },
-        ],
-      };
+      try {
+        // Fetch data from your API
+        const response = await axios.post('/admin/activeuser?type=month');
+        console.log(response);
+        if (response.data.success) {
+          const data = response.data.data; // Assuming data is in the format [{ name: 'Jan', count: 10 }, ...]
+          const labels = data.map((item) => item.name);
+          const counts = data.map((item) => item.count);
 
-      myLineChart.setOption(option);
+          const option = {
+            xAxis: {
+              type: 'category',
+              data: labels,
+            },
+            yAxis: {
+              type: 'value',
+            },
+            series: [
+              {
+                data: counts,
+                type: 'line',
+                smooth: true,
+              },
+            ],
+          };
+
+          myLineChart.setOption(option);
+        } else {
+          console.error('Failed to fetch data:', response.data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching line chart data:', error);
+      }
     };
 
     const initPieChart = () => {
@@ -106,8 +122,8 @@ export default defineComponent({
           top: '5%',
           left: 'center',
           textStyle: {
-        color: 'white', // Change legend text color to white
-      },
+            color: 'white', // Change legend text color to white
+          },
         },
         series: [
           {
@@ -131,8 +147,8 @@ export default defineComponent({
             },
             data: [
               { value: 505, name: 'Negative', itemStyle: { color: 'red' }},
-              { value: 800, name: 'Positive',itemStyle: { color: 'green' } },
-              { value: 484, name: 'Improvement' ,itemStyle: { color: 'yellow' }},
+              { value: 800, name: 'Positive', itemStyle: { color: 'green' }},
+              { value: 484, name: 'Improvement', itemStyle: { color: 'yellow' }},
             ],
           },
         ],
@@ -169,12 +185,12 @@ export default defineComponent({
         page: 1,
         rowsPerPage: 10,
       }),
-     rows :ref([
-  { name:'Ayushi',farmer_id:123,problem:'log in',date:'04-12-2024',time:'16:20'},
-  { name:'Ayushi',farmer_id:123,problem:'log in',date:'04-12-2024',time:'16:20'},
-  { name:'Ayushi',farmer_id:123,problem:'log in',date:'04-12-2024',time:'16:20'},
-  { name:'Ayushi',farmer_id:123,problem:'log in',date:'04-12-2024',time:'16:20'},
-]),
+      rows: ref([
+        { name:'Ayushi',farmer_id:123,problem:'log in',date:'04-12-2024',time:'16:20'},
+        { name:'Ayushi',farmer_id:123,problem:'log in',date:'04-12-2024',time:'16:20'},
+        { name:'Ayushi',farmer_id:123,problem:'log in',date:'04-12-2024',time:'16:20'},
+        { name:'Ayushi',farmer_id:123,problem:'log in',date:'04-12-2024',time:'16:20'},
+      ]),
       columns: ref([
         {
           name: "name",
@@ -229,6 +245,7 @@ export default defineComponent({
   },
 });
 </script>
+
 
 <style scoped>
 .q-table--dark {

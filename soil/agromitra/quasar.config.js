@@ -82,9 +82,18 @@ module.exports = configure(function (/* ctx */) {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devServer
     devServer: {
-      // https: true
-      open: true // opens browser window automatically
+      proxy: {
+        '/admin': {
+          target: 'https://sih-agromitra-new-server-psi.vercel.app',
+          changeOrigin: true,
+          secure: false, // Use true if the target is HTTPS with a valid certificate
+          pathRewrite: {
+            '^/admin': '/admin', // Optional: Rewrite paths if needed
+          },
+        },
+      },
     },
+    
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework
     framework: {

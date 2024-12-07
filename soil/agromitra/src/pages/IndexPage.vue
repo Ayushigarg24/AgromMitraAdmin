@@ -67,6 +67,7 @@ background: linear-gradient(90deg, rgba(11,9,47,1) 0%, rgba(14,14,25,1) 35%, rgb
 
 <script>
 import { defineComponent, onMounted, ref, onBeforeUnmount } from 'vue';
+import { QTable, QDialog, QCard, QCardSection, QCardActions, QBtn, QTd } from "quasar";
 import axios from 'axios';
 import * as echarts from 'echarts/core';
 import { GridComponent, TooltipComponent, LegendComponent } from 'echarts/components';
@@ -78,6 +79,15 @@ echarts.use([GridComponent, TooltipComponent, LegendComponent, LineChart, PieCha
 
 export default defineComponent({
   name: 'MyCharts',
+  components: {
+    QTable,
+    QDialog,
+    QCard,
+    QCardSection,
+    QCardActions,
+    QBtn,
+    QTd,
+  },
   setup() {
     const dialogVisible = ref(false); // Dialog visibility state
     const dialogData = ref({}); // Data to display in the dialog
@@ -261,6 +271,7 @@ export default defineComponent({
     });
 
     return {
+      showDetails,
       dialogVisible,
       dialogData,
       lineChart,

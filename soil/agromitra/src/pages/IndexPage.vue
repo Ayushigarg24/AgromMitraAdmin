@@ -1,17 +1,17 @@
 
  <template>
-  <q-page style="display: flex; flex-direction: column; gap:20px;background: rgb(11,9,47);
+  <q-page style="overflow-x : hidden ;display: flex; flex-direction: column; gap:20px;background: rgb(11,9,47);
 background: linear-gradient(90deg, rgba(11,9,47,1) 0%, rgba(14,14,25,1) 35%, rgba(6,17,47,1) 100%);;">
   <div style="display: flex; justify-content: space-between;">
     <!-- Line Chart -->
      <div style="display: flex; flex-direction: column; gap: 20px;">
     <div style="font-size: 30px; color: white; font-weight: bold; padding-left: 50px; padding-top: 20px;">No of Active Users</div>
-    <div ref="lineChart" style="width: 58vw; height: 400px; margin-bottom: 50px;"></div>
+    <div ref="lineChart" style="width: 48vw; height: 400px; margin-bottom: 50px;"></div>
   </div>
     <!-- Pie Chart -->
      <div style="display: flex; flex-direction: column; gap: 20px;">
       <div style="font-size: 30px; color: white; font-weight: bold; padding-left: 45px; padding-top: 20px;">Feedback Ratio</div>
-    <div ref="pieChart" style="width: 40vw; height: 400px;"></div>
+    <div ref="pieChart" style="width: 35vw; height: 400px;"></div>
   </div>
   </div>
 
@@ -155,8 +155,8 @@ export default defineComponent({
           rows.value = feedbacks.map((feedback) => ({
             email: feedback.email || 'No Email', // Replace with actual API field for email
             problem: feedback.feedback_desc || 'No Problem Stated', // Replace with actual API field for problem
-            date: new Date(feedback.date).toLocaleDateString(), // Format date
-            time: new Date(feedback.date).toLocaleTimeString(), // Format time
+            date: new Date(feedback.createdAt).toLocaleDateString(), // Format date
+            time: new Date(feedback.createdAt).toLocaleTimeString(), // Format time
           }));
           console.log(row.value);
         } else {
@@ -174,9 +174,15 @@ export default defineComponent({
       window.addEventListener('resize', resizeCharts);
     });
 
-    const initPieChart = () => {
-      if (!pieChart.value) return;
-      myPieChart = echarts.init(pieChart.value);
+    const initPieChart = async () => {
+  if (!pieChart.value) return;
+  myPieChart = echarts.init(pieChart.value);
+
+  try {
+    // Fetch data from the feedback count API
+    const response = await axios.get('https://sih-agromitra-new-server-psi.vercel.app/admin/feedback/count');
+    if (response.data.success) {
+      const data = response.data.data; // { positive: <count>, negative: <count> }
 
       const option = {
         tooltip: {
@@ -191,7 +197,7 @@ export default defineComponent({
         },
         series: [
           {
-            name: 'Access From',
+            name: 'Feedback Type',
             type: 'pie',
             radius: ['40%', '70%'],
             avoidLabelOverlap: false,
@@ -210,16 +216,22 @@ export default defineComponent({
               show: false,
             },
             data: [
-              { value: 505, name: 'Negative', itemStyle: { color: 'red' }},
-              { value: 800, name: 'Positive', itemStyle: { color: 'green' }},
-              { value: 484, name: 'Improvement', itemStyle: { color: 'yellow' }},
+              { value: data.negative, name: 'Negative', itemStyle: { color: 'red' } },
+              { value: data.positive, name: 'Positive', itemStyle: { color: 'green' } },
             ],
           },
         ],
       };
 
       myPieChart.setOption(option);
-    };
+    } else {
+      console.error('Failed to fetch data:', response.data.msg);
+    }
+  } catch (error) {
+    console.error('Error fetching pie chart data:', error);
+  }
+};
+
 
     const initLineChart = async () => {
       if (!lineChart.value) return;

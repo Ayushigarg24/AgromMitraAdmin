@@ -18,38 +18,52 @@ background: linear-gradient(90deg, rgba(11,9,47,1) 0%, rgba(14,14,25,1) 35%, rgb
   <div style="display: flex; flex-direction: column; gap: 20px;  background: rgb(11,9,47);
 background: linear-gradient(90deg, rgba(11,9,47,1) 0%, rgba(14,14,25,1) 35%, rgba(6,17,47,1) 100%);">
     <div style="font-size: 30px; color: white; font-weight: bold; padding-left: 50px; padding-top: 20px;">Complaint Table</div>
-  <q-table
-  style="padding-left: 40px; padding-right: 40px; background-color: transparent; color: white;"
-  separator="horizontal"
-        flat
-        :rows="rows"
-        :columns="columns"
-        row-key="name"
-        :pagination="initialPagination"
-        bordered
-      >
-        <template v-slot:body-cell-actions="props">
-          <q-td :props="props">
-            <q-btn
-              dense
-              round
-              flat
-              color="green"
-              icon="edit"
-            ></q-btn>
-            <q-btn
-              dense
-              round
-              flat
-              color="red"
-              icon="delete"
-            ></q-btn>
-          </q-td>
-        </template>
-  </q-table>
+    <q-table
+      style="padding-left: 40px; padding-right: 40px; background-color: transparent; color: white;"
+      separator="horizontal"
+      flat
+      :rows="rows"
+      :columns="columns"
+      row-key="email"
+      :pagination="initialPagination"
+      bordered
+    >
+      <template v-slot:body-cell-actions="props">
+        <q-td :props="props">
+          <q-btn
+            dense
+            flat
+            color="blue"
+            label="Read"
+            @click="showDetails(props.row)"
+          ></q-btn>
+        </q-td>
+      </template>
+    </q-table>
+
+    <!-- Dialog to show feedback details -->
+    <q-dialog v-model="dialogVisible" persistent>
+      <q-card style="width: 400px; max-width: 90vw;">
+        <q-card-section>
+          <div class="text-h6">Feedback Details</div>
+        </q-card-section>
+
+        <q-card-section>
+          <p><strong>Email:</strong> {{ dialogData.email }}</p>
+          <p><strong>Problem:</strong> {{ dialogData.problem }}</p>
+          <p><strong>Date:</strong> {{ dialogData.date }}</p>
+          <p><strong>Time:</strong> {{ dialogData.time }}</p>
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn flat label="Close" color="primary" @click="dialogVisible = false" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </div>
 </q-page>
 </template>
+
 
 <script>
 import { defineComponent, onMounted, ref, onBeforeUnmount } from 'vue';
@@ -65,50 +79,90 @@ echarts.use([GridComponent, TooltipComponent, LegendComponent, LineChart, PieCha
 export default defineComponent({
   name: 'MyCharts',
   setup() {
+    const dialogVisible = ref(false); // Dialog visibility state
+    const dialogData = ref({}); // Data to display in the dialog
 
+    const showDetails = (row) => {
+      dialogData.value = { ...row }; // Set dialog data to the selected row
+      dialogVisible.value = true; // Open the dialog
+    };
     const lineChart = ref(null);
     const pieChart = ref(null);
     let myLineChart = null;
     let myPieChart = null;
 
-    const initLineChart = async () => {
-      if (!lineChart.value) return;
-      myLineChart = echarts.init(lineChart.value);
+    const rows = ref([]); // Rows for the table
+    const columns = ref([
+      {
+        name: "email",
+        label: "Email",
+        align: "left",
+        field: (row) => row.email,
+        format: (val) => `${val}`,
+        sortable: true,
+      },
+      {
+        name: "problem",
+        label: "Problem",
+        align: "left",
+        field: (row) => row.problem,
+        format: (val) => `${val}`,
+        sortable: true,
+      },
+      {
+        name: "date",
+        label: "Date",
+        align: "left",
+        field: (row) => row.date,
+        format: (val) => `${val}`,
+        sortable: true,
+      },
+      {
+        name: "time",
+        label: "Time",
+        align: "left",
+        field: (row) => row.time,
+        format: (val) => `${val}`,
+        sortable: true,
+      },
+      {
+        name: "actions",
+        label: "Actions",
+        align: "center",
+        field: "actions",
+        sortable: false,
+      },
+    ]);
 
+    const fetchTableData = async () => {
       try {
-        // Fetch data from your API
-        const response = await axios.post('/admin/activeuser?type=month');
-        console.log(response);
+        // API call to fetch table data
+        const response = await axios.get('https://sih-agromitra-new-server-psi.vercel.app/admin/feedback?top=10');
         if (response.data.success) {
-          const data = response.data.data; // Assuming data is in the format [{ name: 'Jan', count: 10 }, ...]
-          const labels = data.map((item) => item.name);
-          const counts = data.map((item) => item.count);
-
-          const option = {
-            xAxis: {
-              type: 'category',
-              data: labels,
-            },
-            yAxis: {
-              type: 'value',
-            },
-            series: [
-              {
-                data: counts,
-                type: 'line',
-                smooth: true,
-              },
-            ],
-          };
-
-          myLineChart.setOption(option);
+          const feedbacks = response.data.data;
+          
+          // Transform the API response to match the table structure
+          rows.value = feedbacks.map((feedback) => ({
+            email: feedback.email || 'No Email', // Replace with actual API field for email
+            problem: feedback.feedback_desc || 'No Problem Stated', // Replace with actual API field for problem
+            date: new Date(feedback.date).toLocaleDateString(), // Format date
+            time: new Date(feedback.date).toLocaleTimeString(), // Format time
+          }));
+          console.log(row.value);
         } else {
-          console.error('Failed to fetch data:', response.data.message);
+          console.error('Failed to fetch table data:', response.data.msg);
         }
       } catch (error) {
-        console.error('Error fetching line chart data:', error);
+        console.error('Error fetching table data:', error);
       }
     };
+
+    onMounted(() => {
+      fetchTableData(); // Fetch table data on component mount
+      initLineChart();
+      initPieChart();
+      window.addEventListener('resize', resizeCharts);
+    });
 
     const initPieChart = () => {
       if (!pieChart.value) return;
@@ -157,12 +211,43 @@ export default defineComponent({
       myPieChart.setOption(option);
     };
 
-    onMounted(() => {
-      initLineChart();
-      initPieChart();
-      // Add resize handling
-      window.addEventListener('resize', resizeCharts);
-    });
+    const initLineChart = async () => {
+      if (!lineChart.value) return;
+      myLineChart = echarts.init(lineChart.value);
+
+      try {
+        const response = await axios.post('/admin/activeuser?type=month');
+        console.log(response);
+        if (response.data.success) {
+          const data = response.data.data;
+          const labels = data.map((item) => item.name);
+          const counts = data.map((item) => item.count);
+
+          const option = {
+            xAxis: {
+              type: 'category',
+              data: labels,
+            },
+            yAxis: {
+              type: 'value',
+            },
+            series: [
+              {
+                data: counts,
+                type: 'line',
+                smooth: true,
+              },
+            ],
+          };
+
+          myLineChart.setOption(option);
+        } else {
+          console.error('Failed to fetch data:', response.data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching line chart data:', error);
+      }
+    };
 
     const resizeCharts = () => {
       myLineChart?.resize();
@@ -170,82 +255,22 @@ export default defineComponent({
     };
 
     onBeforeUnmount(() => {
-      // Dispose charts and cleanup
       myLineChart?.dispose();
       myPieChart?.dispose();
       window.removeEventListener('resize', resizeCharts);
     });
 
     return {
+      dialogVisible,
+      dialogData,
       lineChart,
       pieChart,
-      initialPagination: ref({
-        sortBy: "desc",
-        descending: false,
-        page: 1,
-        rowsPerPage: 10,
-      }),
-      rows: ref([
-        { name:'Ayushi',farmer_id:123,problem:'log in',date:'04-12-2024',time:'16:20'},
-        { name:'Ayushi',farmer_id:123,problem:'log in',date:'04-12-2024',time:'16:20'},
-        { name:'Ayushi',farmer_id:123,problem:'log in',date:'04-12-2024',time:'16:20'},
-        { name:'Ayushi',farmer_id:123,problem:'log in',date:'04-12-2024',time:'16:20'},
-      ]),
-      columns: ref([
-        {
-          name: "name",
-          required: true,
-          label: "Name",
-          align: "left",
-          field: (row) => row.name,
-          format: (val) => `${val}`,
-          sortable: true,
-        },
-        {
-          name: "farmer_id",
-          label: "Farmer Id",
-          align: "left",
-          field: (row) => row.farmer_id,
-          format: (val) => `${val}`,
-          sortable: true,
-        },
-        {
-          name: "problem",
-          label: "Problem",
-          align: "left",
-          field: (row) => row.problem,
-          format: (val) => `${val}`,
-          sortable: true,
-        },
-        {
-          name: "date",
-          label: "Date",
-          align: "left",
-          field: (row) => row.date,
-          format: (val) => `${val}`,
-          sortable: true,
-        },
-        {
-          name: "time",
-          label: "Time",
-          align: "left",
-          field: (row) => row.time,
-          format: (val) => `${val}`,
-          sortable: true,
-        },
-        {
-          name: "actions",
-          label: "Actions",
-          align: "center",
-          field: "actions",
-          sortable: false,
-        },
-      ]),
+      rows,
+      columns,
     };
   },
 });
 </script>
-
 
 <style scoped>
 .q-table--dark {

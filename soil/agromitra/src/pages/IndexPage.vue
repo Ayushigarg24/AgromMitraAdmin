@@ -238,7 +238,7 @@ export default defineComponent({
       myLineChart = echarts.init(lineChart.value);
 
       try {
-        const response = await axios.post('/admin/activeuser?type=month');
+        const response = await axios.post('https://sih-agromitra-new-server-psi.vercel.app/admin/activeuser?type=month');
         console.log(response);
         if (response.data.success) {
           const data = response.data.data;

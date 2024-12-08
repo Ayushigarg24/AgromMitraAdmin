@@ -75,7 +75,6 @@ backdrop-filter: blur(15.7px);
           <q-select
           style="/* From https://css.glass */
 background: rgba(105, 127, 197, 0.48);
-
 box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
 backdrop-filter: blur(15.7px);
 -webkit-backdrop-filter: blur(15.7px);
@@ -113,44 +112,75 @@ export default {
     };
   },
   methods: {
-    toggleLeftDrawer() {
-      this.leftDrawerOpen = !this.leftDrawerOpen;
-    },
-    async sendNotification() {
-      // Validate fields
-      if (!this.notification.title || !this.notification.description || !this.notification.priority) {
-        this.$q.notify({
-          type: 'negative',
-          message: 'Please fill in all fields',
-        });
-        return;
-      }
-
-      // Simulate database call
-      try {
-        // Replace with actual API call
-        await this.$q.loading.show();
-        await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulated delay
-
-        // Reset fields and close dialog
-        this.notification = { title: '', description: '', priority: null };
-        this.showDialog = false;
-
-        // Success notification
-        this.$q.notify({
-          type: 'positive',
-          message: 'Notification sent successfully!',
-        });
-      } catch (error) {
-        this.$q.notify({
-          type: 'negative',
-          message: 'Failed to send notification',
-        });
-      } finally {
-        this.$q.loading.hide();
-      }
-    },
+  toggleLeftDrawer() {
+    this.leftDrawerOpen = !this.leftDrawerOpen;
   },
+  async sendNotification() {
+  if (!this.notification.title || !this.notification.description || !this.notification.priority) {
+    if (this.$q.notify) {
+      this.$q.notify({
+        type: 'negative',
+        message: 'Please fill in all fields',
+      });
+    } else {
+      console.error('Notify plugin is not available.');
+    }
+    return;
+  }
+
+  const payload = {
+    title: this.notification.title,
+    description: this.notification.description,
+    priority: this.notification.priority,
+  };
+
+  try {
+    if (this.$q.loading) {
+      this.$q.loading.show();
+    }
+
+    const response = await fetch('https://sih-agromitra-new-server-psi.vercel.app/notification', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to save notification');
+    }
+
+    const result = await response.json();
+
+    if (this.$q.notify) {
+      this.$q.notify({
+        type: 'positive',
+        message: result.message || 'Notification sent successfully!',
+      });
+    }
+
+    this.notification = { title: '', description: '', priority: null };
+    this.showDialog = false;
+  } catch (error) {
+    if (this.$q.notify) {
+      this.$q.notify({
+        type: 'negative',
+        message: error.message || 'An error occurred while sending the notification.',
+      });
+    } else {
+      console.error('Notify plugin is not available.', error);
+    }
+  } finally {
+    if (this.$q.loading) {
+      this.$q.loading.hide();
+    }
+  }
+}
+
+},
+
 };
 </script>
 

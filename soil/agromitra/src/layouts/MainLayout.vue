@@ -155,7 +155,7 @@ export default {
       this.$q.loading.show();
     }
 
-    const response = await fetch('https://sih-agromitra-new-server-psi.vercel.app/notifications', {
+    const response = await fetch('https://sih-agromitra-new-server-omyq.vercel.app/notifications', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

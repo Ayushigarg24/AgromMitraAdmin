@@ -79,7 +79,7 @@
       async handleLogin() {
         try {
           const response = await axios.post(
-            'https://sih-agromitra-new-server-psi.vercel.app/admin/login',
+            'https://sih-agromitra-new-server-omyq.vercel.app/admin/login',
             {
               email: this.email,
               password: this.password,

@@ -86,6 +86,20 @@ backdrop-filter: blur(15.7px);
             dense
             required
           />
+          <q-select
+          style="/* From https://css.glass */
+background: rgba(105, 127, 197, 0.48);
+box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+backdrop-filter: blur(15.7px);
+-webkit-backdrop-filter: blur(15.7px);
+"
+            v-model="notification.icon"
+            label="Icons"
+            :options="['weather','market','pests','health']"
+            outlined
+            dense
+            required
+          />
         </q-card-section>
 
         <q-card-actions align="right">
@@ -108,6 +122,7 @@ export default {
         title: '',
         description: '',
         priority: null,
+        icon: '',
       },
     };
   },
@@ -116,7 +131,7 @@ export default {
     this.leftDrawerOpen = !this.leftDrawerOpen;
   },
   async sendNotification() {
-  if (!this.notification.title || !this.notification.description || !this.notification.priority) {
+  if (!this.notification.title || !this.notification.description || !this.notification.priority || !this.notification.icon) {
     if (this.$q.notify) {
       this.$q.notify({
         type: 'negative',
@@ -132,6 +147,7 @@ export default {
     title: this.notification.title,
     description: this.notification.description,
     priority: this.notification.priority,
+    icon: this.notification.icon,
   };
 
   try {
@@ -139,7 +155,7 @@ export default {
       this.$q.loading.show();
     }
 
-    const response = await fetch('https://sih-agromitra-new-server-psi.vercel.app/notification', {
+    const response = await fetch('https://sih-agromitra-new-server-psi.vercel.app/notifications', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -149,6 +165,7 @@ export default {
 
     if (!response.ok) {
       const errorData = await response.json();
+      console.log(errorData.message);
       throw new Error(errorData.message || 'Failed to save notification');
     }
 
@@ -161,7 +178,7 @@ export default {
       });
     }
 
-    this.notification = { title: '', description: '', priority: null };
+    this.notification = { title: '', description: '', priority: null,icon:'', };
     this.showDialog = false;
   } catch (error) {
     if (this.$q.notify) {

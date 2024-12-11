@@ -1,9 +1,18 @@
 const routes = [
   {
     path: '/',
+    component: () => import('layouts/AdminLayout.vue'),
+    children: [
+      { path: '/', component: () => import('pages/LoginAdmin.vue') },
+      
+    ]
+  },
+  {
+    path: '/',
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      { path: '/', component: () => import('pages/IndexPage.vue') },
+      { path: '/index', component: () => import('pages/IndexPage.vue') },
+      
     ]
   },
   

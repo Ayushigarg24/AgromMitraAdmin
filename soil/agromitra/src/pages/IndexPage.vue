@@ -147,7 +147,7 @@ export default defineComponent({
     const fetchTableData = async () => {
       try {
         // API call to fetch table data
-        const response = await axios.get('https://sih-agromitra-new-server-psi.vercel.app/admin/feedback?top=10');
+        const response = await axios.post('https://sih-agromitra-new-server-psi.vercel.app/admin/feedback?top=10');
         if (response.data.success) {
           const feedbacks = response.data.data;
           
@@ -180,7 +180,7 @@ export default defineComponent({
 
   try {
     // Fetch data from the feedback count API
-    const response = await axios.get('https://sih-agromitra-new-server-psi.vercel.app/admin/feedback/count');
+    const response = await axios.post('https://sih-agromitra-new-server-psi.vercel.app/admin/feedback/count');
     if (response.data.success) {
       const data = response.data.data; // { positive: <count>, negative: <count> }
 
@@ -238,7 +238,7 @@ export default defineComponent({
       myLineChart = echarts.init(lineChart.value);
 
       try {
-        const response = await axios.post('https://sih-agromitra-new-server-psi.vercel.app/admin/activeuser?type=month');
+        const response = await axios.get('https://sih-agromitra-new-server-psi.vercel.app/admin/activeuser?type=month');
         console.log(response);
         if (response.data.success) {
           const data = response.data.data;

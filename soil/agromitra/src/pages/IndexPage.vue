@@ -19,6 +19,9 @@ background: linear-gradient(90deg, rgba(11,9,47,1) 0%, rgba(14,14,25,1) 35%, rgb
 background: linear-gradient(90deg, rgba(11,9,47,1) 0%, rgba(14,14,25,1) 35%, rgba(6,17,47,1) 100%);">
     <div style="font-size: 30px; color: white; font-weight: bold; padding-left: 50px; padding-top: 20px;">Complaint Table</div>
     <q-table
+      Outlined    
+      dark
+      color="amber"
       style="padding-left: 40px; padding-right: 40px; background-color: transparent; color: white;"
       separator="horizontal"
       flat
@@ -26,7 +29,7 @@ background: linear-gradient(90deg, rgba(11,9,47,1) 0%, rgba(14,14,25,1) 35%, rgb
       :columns="columns"
       row-key="email"
       :pagination="initialPagination"
-      bordered
+      bordered="white"
     >
       <template v-slot:body-cell-actions="props">
         <q-td :props="props">
@@ -296,25 +299,4 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.q-table--dark {
-  border: 0; /* Remove all default borders */
-}
-
-.q-table--dark th,
-.q-table--dark td {
-  border: 0; /* Remove all default borders */
-}
-
-.q-table--dark .q-separator {
-  border-color: white; /* Make q-separator white */
-  border-left: none; /* Remove left border */
-  border-right: none; /* Remove right border */
-}
-
-.q-table--dark .q-table__top,
-.q-table--dark .q-table__bottom {
-  border-top: 1px solid white; /* Add top border */
-  border-bottom: 1px solid white; /* Add bottom border */
-}
-
 </style>

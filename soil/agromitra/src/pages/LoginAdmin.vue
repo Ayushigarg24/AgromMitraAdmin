@@ -28,15 +28,24 @@
                   />
   
                   <q-input
+                  :type="isPwd ? 'password' : 'text'"
                     v-model="password"
                     outlined
                     dense
-                    type="password"
+                   
                     label="Password"
                     hint="Enter Password"
                     :rules="[(val) => !!val || 'Password is required']"
                     class="input-field"
-                  />
+                  >
+                  <template v-slot:append>
+          <q-icon
+            :name="isPwd ? 'visibility_off' : 'visibility'"
+            class="cursor-pointer"
+            @click="isPwd = !isPwd"
+          />
+        </template>
+        </q-input>
   
                   <q-btn type="submit" color="primary" label="Log In" class="submit-button" />
                 </div>
@@ -71,6 +80,7 @@
     name: 'LoginPage',
     data() {
       return {
+        isPwd: true,
         email: '',
         password: '',
       };

@@ -111,18 +111,6 @@ The **Admin Dashboard** allows platform administrators to manage users, monitor 
 
 ---
 
-## 📸 Screenshots
-
-Add screenshots of your dashboard here for better presentation.
-
-Example:
-
-```
-![Dashboard Screenshot](screenshots/dashboard.png)
-```
-
----
-
 ## 📈 Future Improvements
 
 - Advanced analytics dashboard
@@ -138,7 +126,6 @@ Example:
 **Ayushi Garg**
 
 - GitHub: https://github.com/Ayushigarg24
-- LinkedIn: https://linkedin.com/in/YOUR_LINK
 
 ---
 

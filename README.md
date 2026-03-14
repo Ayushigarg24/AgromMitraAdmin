@@ -21,7 +21,7 @@ The project was developed as part of **Smart India Hackathon 2024 (Finalist Proj
 ## 🛠️ Tech Stack
 
 Frontend
-- React.js
+- Vue.js
 - JavaScript
 - HTML5
 - CSS3
